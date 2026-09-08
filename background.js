@@ -80,8 +80,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   // ---- Open side panel ----
   if (msg.action === 'openSidePanel') {
     if (chrome.sidePanel) {
-      chrome.sidePanel.open().then(function () { sendResponse({ ok: true }); }).catch(function (e) { sendResponse({ error: e.message }); });
-    } else { sendResponse({ error: 'Side panel not supported' }); }
+      chrome.windows.getCurrent(function (win) {
+        chrome.sidePanel.open({ windowId: win.id })
+          .then(function () { sendResponse({ ok: true }); })
+          .catch(function (e) { sendResponse({ error: e.message }); });
+      });
+    } else { 
+      sendResponse({ error: 'Side panel not supported' }); 
+    }
     return true;
   }
 
